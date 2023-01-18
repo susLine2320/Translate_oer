@@ -68,7 +68,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_output.ConstantSpeed = ATS_CONSTANTSPEED_CONTINUE;
 
 	// パネル入力（変換）
-	ats100 = panel[43];
+	//ats100 = panel[43];
 	ats99 = panel[42];
 	ats98 = panel[41];
 	ats97 = panel[40];
@@ -87,12 +87,12 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	ats67 = panel[52];
 	ats40 = panel[51];
 	ats35 = panel[50];
-	ats24 = panel[2];
+	ats24 = panel[8];
 	ats8 = panel[10];
-	ats126 = panel[22];
-	ats127 = panel[23];
-	ats128 = panel[24];
-	ats129 = panel[25];
+	ats126 = panel[43];
+	ats127 = panel[2];
+	ats128 = panel[59];
+	//ats129 = panel[25];
 	ats130 = panel[55];
 	ats136 = panel[130];
 	ats138 = panel[131];
