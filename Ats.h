@@ -51,7 +51,7 @@ bool ats98;
 bool ats99;
 bool ats100;
 int ats126;
-int ats127;
+bool ats127;
 int ats128;
 int ats129;
 int ats130;
@@ -111,6 +111,7 @@ int ats231;
 int ats233;
 bool ats255;
 int s21;
+int s23;
 int s25;
 int s26;
 int s54;
@@ -118,5 +119,10 @@ int s55;
 int s67;
 int s68;
 int s89;
+
+//Œ±—p
+int ats213;
+
+Translate_oerIni ini;
 
 ATS_HANDLES g_output; // o—Í

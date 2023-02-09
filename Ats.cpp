@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "atsplugin.h"
+#include "iniRead.h"    // #include "Ats.h"の上に書く
 #include "Ats.h"
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
@@ -10,12 +11,36 @@ BOOL APIENTRY DllMain( HANDLE hModule,
                        LPVOID lpReserved
 					 )
 {
+	//HANDLE hModule; //モジュールハンドル
+//ファイルパス格納
+	char filePath[_MAX_PATH + 1] = _T("");
+	//検索文字列へのポインタ
+	char* posIni;
+	bool loadCheck; // INIファイルのロードに成功したかどうか
+	//Ats.dllのファイルパスを取得
+	::GetModuleFileName((HMODULE)hModule, filePath, _MAX_PATH);
+	//パスから.dllの位置を検索
+	posIni = strstr(filePath, ".dll");
+	//.dllを.iniに置換
+	memmove(posIni, ".ini", 4);
+	// INIファイルをロードして結果を取得
+	loadCheck = ini.load(filePath);
+	//INIファイルのロードに失敗した場合
+	/*
+	if (loadCheck == false) {
+		//ロード失敗
+		return false;
+	}
+	//ロード成功
+	return true;
+	*/
     return TRUE;
 }
 
 ATS_API int WINAPI GetPluginVersion()
 {
 	return ATS_VERSION;
+
 }
 
 ATS_API void WINAPI SetVehicleSpec(ATS_VEHICLESPEC vehicleSpec)
@@ -28,6 +53,7 @@ ATS_API void WINAPI Initialize(int brake)
 {
 	g_speed = 0;
 	g_output.Reverser = 0;//起動時レバーサーを切に入れる（これがないと小田急/うさプラ/ATOは戸開中前を出し続けるので必ず入れる）
+	ats213 = ini.Values.UsebrakeOpen; //回生開放有効無効設定
 }
 
 ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int *sound)
@@ -47,19 +73,30 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 		g_output.Brake = g_emgBrake;
 	}
 	
-	if(g_pilotlamp)
+	if(g_pilotlamp)//戸閉時は回生非開放時はレバーサ位置を返す
 	{
-		g_output.Reverser = g_reverser;
-	}
-	else
-	{
-		if (panel[14] == 0) {
-			g_output.Reverser = 1;
-		}
-		else if (panel[14] == 1) {
-			g_output.Reverser = -1;
+		if ((panel[14] == 0 || panel[14] == 1) && ats213 == 0 && g_reverser == 0)//レバーサ前、後ろ、回生開放不使用、かつ中立時
+		{
+			if (panel[14] == 0) {//前なら
+				g_output.Reverser = 1;
+			}
+			else {//後なら
+				g_output.Reverser = -1;
+			}
 		}
 		else {
+			g_output.Reverser = g_reverser;
+		}
+	}
+	else//戸閉時じゃないときは14番に応じレバーサを転換
+	{
+		if (panel[14] == 0) {//前なら
+			g_output.Reverser = 1;
+		}
+		else if (panel[14] == 1) {//後なら
+			g_output.Reverser = -1;
+		}
+		else {//そうでないなら中立
 			g_output.Reverser = 0;
 		}
 	}
@@ -89,10 +126,10 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	ats35 = panel[50];
 	ats24 = panel[8];
 	ats8 = panel[10];
-	ats126 = panel[43];
-	ats127 = panel[2];
-	ats128 = panel[59];
-	//ats129 = panel[25];
+	//ats126 = panel[43];
+	ats127 = panel[43];
+	ats128 = panel[2];
+	ats129 = panel[59];
 	ats130 = panel[55];
 	ats136 = panel[130];
 	ats138 = panel[131];
@@ -225,8 +262,12 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	panel[244] = ats244;
 	panel[255] = ats255;
 
+	//試験用
+	//panel[213] = ats213;
+
 	//サウンド入力（変換）
 	s21 = sound[41];
+	s23 = sound[34];
 	s25 = sound[0];
 	s26 = sound[1];
 	s54 = sound[3];
@@ -237,6 +278,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	
 	// サウンド出力（変換）
 	sound[21] = s21;
+	sound[23] = s23;
 	sound[25] = s25;
 	sound[26] = s26;
 	sound[54] = s54;
@@ -253,6 +295,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	sound[5] = ATS_SOUND_STOP;
 	sound[7] = ATS_SOUND_STOP;
 	sound[8] = ATS_SOUND_STOP;
+	sound[34] = ATS_SOUND_STOP;
 	sound[41] = ATS_SOUND_STOP;
 
 
