@@ -63,7 +63,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_speed = vehicleState.Speed;
 
 	// ハンドル出力
-	
+	/*
 	if(g_brakeNotch != g_emgBrake)
 	{
 		g_output.Brake = g_brakeNotch;
@@ -71,7 +71,8 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	else
 	{
 		g_output.Brake = g_emgBrake;
-	}
+	}*/
+	g_output.Brake = g_brakeNotch; //このPIからはBノッチへの介入を行わない
 	
 	if(g_pilotlamp)//戸閉時は回生非開放時はレバーサ位置を返す
 	{
@@ -287,6 +288,9 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	sound[68] = s68;
 	sound[89] = s89;
 
+	sound[238] = g_brakeNotch; //TranslateBに値を転送する
+	sound[239] = g_powerNotch; //TranslateBに値を転送する
+
 	//サウンド出力（元番号を0に）
 	sound[0] = ATS_SOUND_STOP;
 	sound[1] = ATS_SOUND_STOP;
@@ -297,7 +301,6 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	sound[8] = ATS_SOUND_STOP;
 	sound[34] = ATS_SOUND_STOP;
 	sound[41] = ATS_SOUND_STOP;
-
 
 
     return g_output;
